@@ -1,42 +1,36 @@
 <template>
   <div>
-    <ul>
-      <li v-for="(todo, index) in todoItems" v-bind:key="todo">
-        {{todo}}
+    <transition-group name="list" tag="ul">
+      <li v-for="(todo, index) in propsdata" v-bind:key="todo.item">
+        <i
+          class="fas fa-check"
+          v-bind:class="{check_btn_completed: todo.completed}"
+          v-on:click="toggleComplete(todo, index)"
+        ></i>
+        <span v-bind:class="{text_completed: todo.completed}">{{todo.item}}</span>
         <span class="remove_btn" v-on:click="remove_todos(todo, index)">
           <i class="fas fa-trash-alt"></i>
         </span>
       </li>
-    </ul>
+    </transition-group>
   </div>
 </template>
 
 <script>
 export default {
-  data: () => {
-    return {
-      todoItems: [],
-    };
-  },
+  props: ["propsdata"],
   methods: {
-    remove_todos: function (item, index) {
-      localStorage.removeItem(item);
-      this.todoItems.splice(index, 1);
+    remove_todos: function (todo, index) {
+      this.$emit("removeItem", todo, index);
     },
-  },
-  created: function () {
-    if (localStorage.length > 0) {
-      for (var i = 0; i < localStorage.length; i++) {
-        if (localStorage.key(i) !== "loglevel:webpack-dev-server") {
-          this.todoItems.push(localStorage.key(i));
-        }
-      }
-    }
+    toggleComplete: function (todo, index) {
+      this.$emit("toggleTodo", todo, index);
+    },
   },
 };
 </script>
 
-<style>
+<style scoped>
 ul {
   list-style-type: none;
   padding-left: 0px;
@@ -68,5 +62,16 @@ li {
 .remove_btn {
   margin-left: auto;
   color: #de4343;
+}
+
+/* 리스트아이템 트렌지션 효과 */
+
+.list-enter-active,
+.list-leave-active {
+  transition: all 1s;
+}
+.list-enter, .list-leave-to /* .list-leave-active below version 2.1.8 */ {
+  opacity: 0;
+  transform: translateY(30px);
 }
 </style>

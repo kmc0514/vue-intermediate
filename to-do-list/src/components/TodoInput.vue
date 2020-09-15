@@ -4,25 +4,46 @@
     <span class="add_container" v-on:click="addTodo">
       <i class="fas fa-plus add_btn"></i>
     </span>
+    <Modal v-if="showModal" @close="showModal = false">
+      <!--
+      you can use custom content here to overwrite
+      default content
+      -->
+      <h3 slot="header">
+        알림
+        <i class="close_modal_btn fas fa-times" @click="showModal = false"></i>
+      </h3>
+      <div slot="body">최소 1글자 이상 입력하세요.</div>
+      <div slot="footer"></div>
+    </Modal>
   </div>
 </template>
 
 <script>
+import Modal from "./common/Modal.vue";
+
 export default {
   data: () => {
     return {
       newTodoItem: "",
+      showModal: false,
     };
   },
   methods: {
     addTodo: function () {
-      console.log(this.newTodoItem);
-      localStorage.setItem(this.newTodoItem, this.newTodoItem);
-      this.clearInput();
+      if (this.newTodoItem !== "") {
+        this.$emit("addTodoItem", this.newTodoItem);
+        this.clearInput();
+      } else {
+        this.showModal = !this.showModal;
+      }
     },
     clearInput: function () {
       this.newTodoItem = "";
     },
+  },
+  components: {
+    Modal,
   },
 };
 </script>
@@ -55,5 +76,9 @@ input:focus {
 .add_btn {
   color: white;
   vertical-align: middle;
+}
+
+.close_modal_btn {
+  color: #42b983;
 }
 </style>
